@@ -35,7 +35,6 @@ const slackHook = process.env.SLACK_HOOK
     }
   }, '.map-container')
 
-  await page.waitFor(2000)
   await page.evaluate(() => {
     var cases = document.getElementById('ember77')
     var width = cases.style.width
@@ -53,7 +52,6 @@ const slackHook = process.env.SLACK_HOOK
       el.style.left = width
     })
   })
-  await page.waitFor(2000)
   // const response = await promisify(request)({
   // url: slackHook,
   // method: 'POST',

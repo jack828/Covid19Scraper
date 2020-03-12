@@ -2,7 +2,7 @@ const moment = require('moment')
 const qs = require('querystring')
 const fs = require('fs')
 const puppeteer = require('puppeteer')
-const request = require('request-promise')
+const request = require('request')
 const promisify = require('util').promisify
 
 const token = process.env.SLACK_TOKEN
@@ -65,7 +65,7 @@ const channel = process.env.SLACK_CHANNEL
   console.log('Done.')
   console.log('Uploading')
 
-  let res = await request({
+  let res = await promisify(request)({
     url: `https://slack.com/api/files.upload`,
     method: 'POST',
     formData: {
@@ -77,9 +77,9 @@ const channel = process.env.SLACK_CHANNEL
       file: fs.createReadStream('infect.png')
     }
   })
-  console.log(res)
+  console.log(res.statusCode, res.body)
 
-  res = await request({
+  res = await promisify(request)({
     url: `https://slack.com/api/chat.postMessage?${qs.stringify({
       token,
       channel,
@@ -88,5 +88,5 @@ const channel = process.env.SLACK_CHANNEL
     })}`,
     method: 'POST'
   })
-  console.log(res)
+  console.log(res.statusCode, res.body)
 })()

@@ -1,12 +1,12 @@
+const moment = require('moment')
+const qs = require('querystring')
+const fs = require('fs')
 const puppeteer = require('puppeteer')
-const request = require('request')
+const request = require('request-promise')
 const promisify = require('util').promisify
 
-const screenshot = 'infect.png'
-
-const secret = process.env.SECRET
-
-const slackHook = process.env.SLACK_HOOK
+const token = process.env.SLACK_TOKEN
+const channel = process.env.SLACK_CHANNEL
 
 ;(async () => {
   const browser = await puppeteer.launch({ headless: true })
@@ -52,21 +52,41 @@ const slackHook = process.env.SLACK_HOOK
       el.style.left = width
     })
   })
-  // const response = await promisify(request)({
-  // url: slackHook,
-  // method: 'POST',
-  // headers: { 'Content-type': 'application/json' },
-  // body: `{"text":"Current Fund Value: ${fundValue}"}`
-  // })
-
   // await page.goto(
   // 'https://www.charles-stanley-direct.co.uk/My_Dashboard/My_Direct_Accounts/Combined_Portfolio'
   // )
+
   console.log('Screenshotting')
-  await page.screenshot({
-    path: screenshot,
+  const screenshot = await page.screenshot({
+    path: 'infect.png',
     clip: { x: 0, y: 0, width: 1200, height: 1080 }
   })
   await browser.close()
-  console.log('See screenshot: ' + screenshot)
+  console.log('Done.')
+  console.log('Uploading')
+
+  let res = await request({
+    url: `https://slack.com/api/files.upload`,
+    method: 'POST',
+    formData: {
+      token,
+      channels: channel,
+      title: moment().format('YYYY-MM-DD'),
+      filename: 'image.png',
+      filetype: 'image/png',
+      file: fs.createReadStream('infect.png')
+    }
+  })
+  console.log(res)
+
+  res = await request({
+    url: `https://slack.com/api/chat.postMessage?${qs.stringify({
+      token,
+      channel,
+      as_user: true,
+      text: 'How to get through it:\n1. Don’t panic!\n2. Wash hands\n3. Drink tea\n4. ???\n5. Profit!'
+    })}`,
+    method: 'POST'
+  })
+  console.log(res)
 })()

@@ -102,7 +102,7 @@ const uploadScreenshot = async ({ filename }) => {
       title: `${moment().format('YYYY-MM-DD')}-${filename}`,
       filename,
       filetype: 'image/png',
-      file: fs.createReadStream('infect.png')
+      file: fs.createReadStream(filename)
     }
   })
   console.log(`Uploaded ${filename}`, res.statusCode, res.body)

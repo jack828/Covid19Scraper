@@ -4,10 +4,19 @@ const qs = require('querystring')
 const fs = require('fs')
 const puppeteer = require('puppeteer')
 const request = require('request')
-const promisify = require('util').promisify
+const { promisify } = require('util')
+const { exec } = require('child_process')
 
 const token = process.env.SLACK_TOKEN
 const channel = process.env.SLACK_CHANNEL
+
+const execute = command =>
+  new Promise(resolve =>
+    exec(command, (error, stdout) => {
+      if (error) return reject(error)
+      resolve(stdout)
+    })
+  )
 
 const sendMessage = async text => {
   const res = await promisify(request)({

@@ -9,15 +9,32 @@ const promisify = require('util').promisify
 const token = process.env.SLACK_TOKEN
 const channel = process.env.SLACK_CHANNEL
 
-const takeScreenshot = async (browser, {
-  filename,
-  url,
-  waitUntil = 'networkidle0',
-  size,
-  elementsToRemove,
-  leftHandElementId,
-  rightHandElementIds
-}) => {
+const sendMessage = async text => {
+  const res = await promisify(request)({
+    url: `https://slack.com/api/chat.postMessage?${qs.stringify({
+      token,
+      channel,
+      as_user: true,
+      text
+    })}`,
+    method: 'POST'
+  })
+
+  console.log(res.statusCode, res.body)
+}
+
+const takeScreenshot = async (
+  browser,
+  {
+    filename,
+    url,
+    waitUntil = 'networkidle0',
+    size,
+    elementsToRemove,
+    leftHandElementId,
+    rightHandElementIds
+  }
+) => {
   console.log(`Screenshotting ${filename}`)
   const page = await browser.newPage()
 
@@ -92,7 +109,7 @@ const uploadScreenshot = async ({ filename }) => {
 }
 
 ;(async () => {
-  const browser = await puppeteer.launch({ headless: false, devtools: false })
+  const browser = await puppeteer.launch({ headless: true, devtools: false })
 
   await takeScreenshot(browser, {
     filename: 'uk-cases.png',
@@ -110,7 +127,8 @@ const uploadScreenshot = async ({ filename }) => {
     ]
   })
 
-  // await uploadScreenshot({ filename: 'uk-cases.png' })
+  await uploadScreenshot({ filename: 'uk-cases.png' })
+  await sendMessage(`SOURCE: https://bit.ly/UKGOVDASH`)
 
   await takeScreenshot(browser, {
     filename: 'global-cases.png',
@@ -123,18 +141,8 @@ const uploadScreenshot = async ({ filename }) => {
     rightHandElementIds: ['ember80', 'ember87']
   })
 
+  await uploadScreenshot({ filename: 'global-cases.png' })
+  await sendMessage(`SOURCE: https://bit.ly/WHODASH`)
   await browser.close()
-  // TODO sendmessage
-  // SOURCE: bit.ly/SOMETHING
-  res = await promisify(request)({
-    url: `https://slack.com/api/chat.postMessage?${qs.stringify({
-      token,
-      channel,
-      as_user: true,
-      text:
-        'How to get through it:\n1. Don’t panic!\n2. Wash hands\n3. Drink tea\n4. ???\n5. Profit!'
-    })}`,
-    method: 'POST'
-  })
-  console.log(res.statusCode, res.body)
+  process.exit(0)
 })()

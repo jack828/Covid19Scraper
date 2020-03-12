@@ -9,51 +9,68 @@ const promisify = require('util').promisify
 const token = process.env.SLACK_TOKEN
 const channel = process.env.SLACK_CHANNEL
 
-const takeScreenshot = async ({
+const takeScreenshot = async (browser, {
   filename,
   url,
+  waitUntil = 'networkidle0',
+  size,
   elementsToRemove,
   leftHandElementId,
   rightHandElementIds
 }) => {
   console.log(`Screenshotting ${filename}`)
-
-  const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
 
   console.log('Launched Puppeteer')
-
   await page.setViewport({
     width: 1920,
     height: 1080
   })
 
-  await page.goto(url, { waitUntil: 'networkidle0' })
+  await page.goto(url, { waitUntil })
+  // page.on('console', msg => console.log(msg.text()))
+
+  page.on('console', msg => {
+    for (let i = 0; i < msg._args.length; ++i)
+      console.log(`${i}: ${msg._args[i].toString()}`)
+  })
+  // await page.waitFor(1000)
 
   console.log('Navigation complete')
 
-  await page.evaluate(elements => {
-    for (var i = 0; i < elements.length; i++) {
-      const el = document.getElementById(elements[i])
-      el.parentElement.removeChild(el)
+  await page.evaluate(removeElements => {
+    console.log(removeElements.toString())
+    for (var i = 0; i < removeElements.length; i++) {
+      const removeEl = document.getElementById(removeElements[i])
+      if (!removeEl)
+        return console.log('NO ELEMENT REMOVE', removeEl, removeElements[i])
+      removeEl.parentElement.removeChild(removeEl)
     }
   }, elementsToRemove)
 
-  await page.evaluate((leftHandEl, rightHandEls) => {
-    var cases = document.getElementById(leftHandEl)
-    var width = cases.style.width
+  await page.evaluate(
+    (leftHandEl, rightHandEls) => {
+      console.log('leftHandEl ' + leftHandEl)
+      var leftEl = document.getElementById(leftHandEl)
+      if (!leftEl) return console.log('NO ELEMENT LEFT', leftEl, leftHandEl)
+      var width = leftEl.style.width
 
-    rightHandEls.forEach(id => {
-      var el = document.getElementById(id)
-      el.style.left = width
-    })
-  }, leftHandElementId, rightHandElementIds)
+      rightHandEls.forEach(id => {
+        console.log('rightHandEl id ' + id)
+        var rightEl = document.getElementById(id)
+        if (!rightEl) return console.log('NO ELEMENT RIGHT', rightEl, id)
+        rightEl.style.left = width
+      })
+    },
+    leftHandElementId,
+    rightHandElementIds
+  )
 
   const screenshot = await page.screenshot({
     path: filename,
-    clip: { x: 0, y: 0, width: 1200, height: 1080 }
+    clip: size
   })
-  await browser.close()
+  await page.close()
   console.log(`Screenshotted ${filename}`)
 }
 
@@ -75,10 +92,13 @@ const uploadScreenshot = async ({ filename }) => {
 }
 
 ;(async () => {
-  await takeScreenshot({
+  const browser = await puppeteer.launch({ headless: false, devtools: false })
+
+  await takeScreenshot(browser, {
     filename: 'uk-cases.png',
     url:
       'https://www.arcgis.com/apps/opsdashboard/index.html#/f94c3c90da5b4e9f9a0b19484dd4bb14',
+    size: { x: 0, y: 0, width: 1200, height: 1080 },
     elementsToRemove: ['ember85'],
     leftHandElementId: 'ember77',
     rightHandElementIds: [
@@ -90,10 +110,22 @@ const uploadScreenshot = async ({ filename }) => {
     ]
   })
 
-  await uploadScreenshot({ filename: 'uk-cases.png' })
+  // await uploadScreenshot({ filename: 'uk-cases.png' })
 
+  await takeScreenshot(browser, {
+    filename: 'global-cases.png',
+    url:
+      'https://who.maps.arcgis.com/apps/opsdashboard/index.html#/bf48be9799364068be4706c56b1916f5',
+    size: { x: 0, y: 0, width: 700, height: 1080 },
+    waitUntil: 'networkidle0',
+    elementsToRemove: ['ember65', 'ember70', 'ember75'],
+    leftHandElementId: 'ember42',
+    rightHandElementIds: ['ember80', 'ember87']
+  })
 
-  // process.exit(0)
+  await browser.close()
+  // TODO sendmessage
+  // SOURCE: bit.ly/SOMETHING
   res = await promisify(request)({
     url: `https://slack.com/api/chat.postMessage?${qs.stringify({
       token,

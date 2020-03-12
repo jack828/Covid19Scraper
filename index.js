@@ -1,4 +1,4 @@
-require('dotenv')
+require('dotenv').config()
 const moment = require('moment')
 const qs = require('querystring')
 const fs = require('fs')

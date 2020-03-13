@@ -18,7 +18,7 @@ const execute = command =>
     })
   )
 
-const sendMessage = async text => {
+const sendMessage = async ({ text }) => {
   const res = await promisify(request)({
     url: `https://slack.com/api/chat.postMessage?${qs.stringify({
       token,
@@ -137,7 +137,7 @@ const uploadScreenshot = async ({ filename }) => {
   })
 
   await uploadScreenshot({ filename: 'uk-cases.png' })
-  await sendMessage(`SOURCE: https://bit.ly/UKGOVDASH`)
+  await sendMessage({ text: `SOURCE: https://bit.ly/UKGOVDASH` })
 
   await takeScreenshot(browser, {
     filename: 'global-cases.png',
@@ -151,7 +151,8 @@ const uploadScreenshot = async ({ filename }) => {
   })
 
   await uploadScreenshot({ filename: 'global-cases.png' })
-  await sendMessage(`SOURCE: https://bit.ly/WHODASH`)
+  await sendMessage({ text: `SOURCE: https://bit.ly/WHODASH` })
+
   await browser.close()
   process.exit(0)
 })()

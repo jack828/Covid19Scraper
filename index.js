@@ -18,13 +18,13 @@ const execute = command =>
     })
   )
 
-const sendMessage = async ({ text }) => {
+const sendMessage = async options => {
   const res = await promisify(request)({
     url: `https://slack.com/api/chat.postMessage?${qs.stringify({
       token,
       channel,
       as_user: true,
-      text
+      ...options
     })}`,
     method: 'POST'
   })
@@ -114,7 +114,18 @@ const uploadScreenshot = async ({ filename }) => {
       file: fs.createReadStream(filename)
     }
   })
-  console.log(`Uploaded ${filename}`, res.statusCode, res.body)
+  console.log(`Uploaded ${filename}`, res.statusCode)
+  console.dir(JSON.parse(res.body), { depth: null, colors: true })
+  return JSON.parse(res.body)
+}
+
+const getThread = ({
+  file: {
+    shares: { private }
+  }
+}) => {
+  const [{ ts }] = private[channel]
+  return ts
 }
 
 ;(async () => {
@@ -136,9 +147,6 @@ const uploadScreenshot = async ({ filename }) => {
     ]
   })
 
-  await uploadScreenshot({ filename: 'uk-cases.png' })
-  await sendMessage({ text: `SOURCE: https://bit.ly/UKGOVDASH` })
-
   await takeScreenshot(browser, {
     filename: 'global-cases.png',
     url:
@@ -150,9 +158,24 @@ const uploadScreenshot = async ({ filename }) => {
     rightHandElementIds: ['ember80', 'ember87']
   })
 
-  await uploadScreenshot({ filename: 'global-cases.png' })
-  await sendMessage({ text: `SOURCE: https://bit.ly/WHODASH` })
+  const ukScreenshot = await uploadScreenshot({ filename: 'uk-cases.png' })
+  const ukImageThread = getThread(ukScreenshot)
+
+  await sendMessage({
+    text: `Source: https://bit.ly/UKGOVDASH`,
+    thread_ts: ukImageThread
+  })
+
+  const globalScreenshot = await uploadScreenshot({
+    filename: 'global-cases.png'
+  })
+  const globalImageThread = getThread(globalScreenshot)
+  await sendMessage({
+    text: `Source: https://bit.ly/WHODASH`,
+    thread_ts: globalImageThread
+  })
 
   await browser.close()
   process.exit(0)
+  // return (await browser.close()) && process.exit(0)
 })()

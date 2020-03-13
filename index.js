@@ -158,22 +158,26 @@ const getThread = ({
     rightHandElementIds: ['ember80', 'ember87']
   })
 
-  const ukScreenshot = await uploadScreenshot({ filename: 'uk-cases.png' })
+  const [ukScreenshot, globalScreenshot] = await Promise.all([
+    uploadScreenshot({ filename: 'uk-cases.png' }),
+    uploadScreenshot({
+      filename: 'global-cases.png'
+    })
+  ])
   const ukImageThread = getThread(ukScreenshot)
-
-  await sendMessage({
-    text: `Source: https://bit.ly/UKGOVDASH`,
-    thread_ts: ukImageThread
-  })
-
-  const globalScreenshot = await uploadScreenshot({
-    filename: 'global-cases.png'
-  })
   const globalImageThread = getThread(globalScreenshot)
-  await sendMessage({
-    text: `Source: https://bit.ly/WHODASH`,
-    thread_ts: globalImageThread
-  })
+
+  await Promise.all([
+    sendMessage({
+      text: `Source: https://bit.ly/UKGOVDASH`,
+      thread_ts: ukImageThread
+    }),
+
+    sendMessage({
+      text: `Source: https://bit.ly/WHODASH`,
+      thread_ts: globalImageThread
+    })
+  ])
 
   await browser.close()
   process.exit(0)

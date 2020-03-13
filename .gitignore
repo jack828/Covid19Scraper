@@ -103,6 +103,6 @@ dist
 # TernJS port file
 .tern-port
 
-infect.png
-uk-cases.png
-global-cases.png
+uk-cases.*
+global-cases.*
+

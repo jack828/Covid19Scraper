@@ -1,6 +1,5 @@
 #!/bin/bash
 source .env
-rm -rf infect.png
-cd /var/application/infect/
+rm -rf uk-cases.png world-cases.png
 git pull
 nave use 10 node ./index.js

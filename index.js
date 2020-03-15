@@ -3,12 +3,10 @@ const moment = require('moment')
 const qs = require('querystring')
 const fs = require('fs')
 const puppeteer = require('puppeteer')
-const request = require('request')
 const { promisify } = require('util')
 const { exec } = require('child_process')
 const { WebClient } = require('@slack/web-api')
 const createResultsFilter = require('./lib/results-filter')
-
 
 const botToken = process.env.SLACK_BOT_TOKEN
 const token = process.env.SLACK_TOKEN
@@ -25,17 +23,12 @@ const execute = command =>
   )
 
 const sendMessage = async options => {
-  const res = await promisify(request)({
-    url: `https://slack.com/api/chat.postMessage?${qs.stringify({
-      token,
-      channel,
-      as_user: true,
-      ...options
-    })}`,
-    method: 'POST'
+  const res = await web.chat.postMessage({
+    channel,
+    ...options
   })
 
-  console.log(res.statusCode, res.body)
+  console.log(res)
 }
 
 const takeScreenshot = async (
@@ -108,21 +101,16 @@ const takeScreenshot = async (
 
 const uploadScreenshot = async ({ filename }) => {
   console.log(`Uploading ${filename}`)
-  const res = await promisify(request)({
-    url: `https://slack.com/api/files.upload`,
-    method: 'POST',
-    formData: {
-      token,
-      channels: channel,
-      title: `${moment().format('YYYY-MM-DD')}-${filename}`,
-      filename,
-      filetype: 'image/png',
-      file: fs.createReadStream(filename)
-    }
+  const res = await web.files.upload({
+    channels: channel,
+    title: `${moment().format('YYYY-MM-DD')}-${filename}`,
+    filename,
+    filetype: 'image/png',
+    file: fs.createReadStream(filename)
   })
-  console.log(`Uploaded ${filename}`, res.statusCode)
-  console.dir(JSON.parse(res.body), { depth: null, colors: true })
-  return JSON.parse(res.body)
+  console.log(`Uploaded ${filename}`)
+  console.dir(res, { depth: null, colors: true })
+  return res
 }
 
 const getThread = ({

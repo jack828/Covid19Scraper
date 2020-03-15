@@ -1,5 +1,7 @@
-#!/bin/bash
+#!/bin/zsh
 source .env
-rm -rf global-cases.json
-rm -rf uk-cases.json
-nave use 10 node /var/application/infect/datascraper.js
+rm -rf uk-cases.json global-cases.json
+git pull
+yarn
+node -v
+node ./datascraper.js

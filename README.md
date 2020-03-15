@@ -53,3 +53,4 @@ Best to run shortly after 9AM updates.
 ## Interactive Server
 
 A server is provided at `./server.js` to allow responding to interactive elements.
+I use [pm2](https://www.npmjs.com/package/pm2) to manage this server.

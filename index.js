@@ -125,12 +125,6 @@ const getThread = ({
 }
 
 ;(async () => {
-  const filterMessage = await web.chat.postMessage({
-    channel,
-    blocks: createResultsFilter()
-  })
-
-  console.log(filterMessage)
   const browser = await puppeteer.launch({ headless: true, devtools: false })
 
   await takeScreenshot(browser, {
@@ -180,6 +174,13 @@ const getThread = ({
       thread_ts: globalImageThread
     })
   ])
+
+  const filterMessage = await web.chat.postMessage({
+    channel,
+    blocks: createResultsFilter()
+  })
+
+  console.log(filterMessage)
 
   await browser.close()
   process.exit(0)

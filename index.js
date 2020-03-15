@@ -6,9 +6,15 @@ const puppeteer = require('puppeteer')
 const request = require('request')
 const { promisify } = require('util')
 const { exec } = require('child_process')
+const { WebClient } = require('@slack/web-api')
+const createResultsFilter = require('./lib/results-filter')
 
+
+const botToken = process.env.SLACK_BOT_TOKEN
 const token = process.env.SLACK_TOKEN
 const channel = process.env.SLACK_CHANNEL
+
+const web = new WebClient(botToken)
 
 const execute = command =>
   new Promise(resolve =>
@@ -131,6 +137,12 @@ const getThread = ({
 }
 
 ;(async () => {
+  const filterMessage = await web.chat.postMessage({
+    channel,
+    blocks: createResultsFilter()
+  })
+
+  console.log(filterMessage)
   const browser = await puppeteer.launch({ headless: true, devtools: false })
 
   await takeScreenshot(browser, {

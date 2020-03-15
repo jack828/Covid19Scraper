@@ -121,10 +121,11 @@ const uploadScreenshot = async ({ filename }) => {
 
 const getThread = ({
   file: {
-    shares: { private }
+    shares: { private, public }
   }
 }) => {
-  const [{ ts }] = private[channel]
+  const messageData = private[channel] || public[channel]
+  const [{ ts }] = messageData
   return ts
 }
 

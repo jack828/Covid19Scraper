@@ -124,7 +124,8 @@ const getThread = ({
     shares: { private, public }
   }
 }) => {
-  const messageData = private[channel] || public[channel]
+  const postedChannel = private || public
+  const messageData = postedChannel[channel]
   const [{ ts }] = messageData
   return ts
 }

@@ -8,6 +8,10 @@ It will need the Interactive Components enabled, with these endpoints:
  - Request - `<URL>/api/slack/request`
  - Select Menus - `<URL>/api/slack/select`
 
+For OAuth scopes, you need to enable:
+ - chat:write
+ - files:read
+ - files:upload
 
 | ENV | Usage |
 |-----|-------|

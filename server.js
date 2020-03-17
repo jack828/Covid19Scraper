@@ -26,9 +26,17 @@ const execute = command =>
     })
   )
 
+const fuzzyMatchData = (query, { data }) => {
+  const keys = Object.keys(data)
+  const matching = keys.filter(key =>
+    key.toLowerCase().includes(query.toLowerCase())
+  )
+  return matching
+}
+
 app.use(morgan('dev'))
 
-createSlackRoutes(app, { readData, execute })
+createSlackRoutes(app, { readData, fuzzyMatchData, execute })
 
 app.listen(port, error => {
   if (error) throw error

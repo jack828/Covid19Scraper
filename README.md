@@ -19,6 +19,7 @@ For OAuth scopes, you need to enable:
 | SLACK_BOT_TOKEN | Your slack bot token |
 | SLACK_CHANNEL | The channel to post to |
 | PORT | Port the webserver runs on |
+| ISLAND_HANGOUT_URL | An always open webchat link |
 
 ## Cron Jobs
 

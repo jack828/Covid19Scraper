@@ -132,14 +132,13 @@ const getThread = ({
     url:
       'https://www.arcgis.com/apps/opsdashboard/index.html#/f94c3c90da5b4e9f9a0b19484dd4bb14',
     size: { x: 0, y: 0, width: 1200, height: 1080 },
-    elementsToRemove: ['ember85'],
-    leftHandElementId: 'ember77',
+    elementsToRemove: ['ember92'],
+    leftHandElementId: 'ember84',
     rightHandElementIds: [
-      'ember90',
-      'ember95',
+      'ember97',
       'ember102',
       'ember109',
-      'ember120'
+      'ember116'
     ]
   })
 

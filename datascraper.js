@@ -62,7 +62,7 @@ const calcTotal = data =>
     url:
       'https://www.arcgis.com/apps/opsdashboard/index.html#/f94c3c90da5b4e9f9a0b19484dd4bb14',
     filename: 'uk-cases',
-    tableContainer: 'ember95',
+    tableContainer: 'ember102',
     extractRegex: '(.*?):.?(\\d*)'
   })
 

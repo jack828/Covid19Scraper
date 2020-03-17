@@ -34,9 +34,10 @@ const fuzzyMatchData = (query, { data }) => {
   return matching
 }
 
+const random = items => items[Math.floor(Math.random() * items.length)]
 app.use(morgan('dev'))
 
-createSlackRoutes(app, { readData, fuzzyMatchData, execute })
+createSlackRoutes(app, { readData, fuzzyMatchData, execute, random })
 
 app.listen(port, error => {
   if (error) throw error

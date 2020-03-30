@@ -124,8 +124,9 @@ const getThread = ({
   return ts
 }
 
+let browser
 ;(async () => {
-  const browser = await puppeteer.launch({ headless: true, devtools: false })
+  browser = await puppeteer.launch({ headless: true, devtools: false })
 
   await takeScreenshot(browser, {
     filename: 'uk-cases.png',
@@ -134,12 +135,7 @@ const getThread = ({
     size: { x: 0, y: 0, width: 1200, height: 1080 },
     elementsToRemove: ['ember77'],
     leftHandElementId: 'ember69', // nice
-    rightHandElementIds: [
-      'ember82',
-      'ember87',
-      'ember94',
-      'ember101'
-    ]
+    rightHandElementIds: ['ember82', 'ember87', 'ember94', 'ember101']
   })
 
   await takeScreenshot(browser, {
@@ -185,3 +181,12 @@ const getThread = ({
   process.exit(0)
   // return (await browser.close()) && process.exit(0)
 })()
+
+process.on('unhandledRejection', async () => {
+  if (browser) await browser.close()
+  process.exit(1)
+})
+process.on('uncaughtException', async () => {
+  if (browser) await browser.close()
+  process.exit(2)
+})

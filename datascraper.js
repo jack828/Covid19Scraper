@@ -55,8 +55,9 @@ const scrapeResultsTable = async (
 const calcTotal = data =>
   Object.keys(data).reduce((total, key) => total + Number(data[key]), 0)
 
+let browser
 ;(async () => {
-  const browser = await puppeteer.launch({ headless: true, devtools: true })
+  browser = await puppeteer.launch({ headless: true, devtools: false })
 
   const ukResults = await scrapeResultsTable(browser, {
     url:
@@ -93,3 +94,12 @@ const calcTotal = data =>
   await browser.close()
   process.exit(0)
 })()
+
+process.on('unhandledRejection', async () => {
+  if (browser) await browser.close()
+  process.exit(1)
+})
+process.on('uncaughtException', async () => {
+  if (browser) await browser.close()
+  process.exit(2)
+})

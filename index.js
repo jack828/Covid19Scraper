@@ -170,12 +170,12 @@ let browser
     })
   ])
 
-  const filterMessage = await web.chat.postMessage({
-    channel,
-    blocks: createResultsFilter()
-  })
+  // const filterMessage = await web.chat.postMessage({
+    // channel,
+    // blocks: createResultsFilter()
+  // })
 
-  console.log(filterMessage)
+  // console.log(filterMessage)
 
   await browser.close()
   process.exit(0)

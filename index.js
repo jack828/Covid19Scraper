@@ -133,9 +133,9 @@ let browser
     url:
       'https://www.arcgis.com/apps/opsdashboard/index.html#/f94c3c90da5b4e9f9a0b19484dd4bb14',
     size: { x: 0, y: 0, width: 1200, height: 1080 },
-    elementsToRemove: ['ember77'],
-    leftHandElementId: 'ember69', // nice
-    rightHandElementIds: ['ember82', 'ember87', 'ember94', 'ember101']
+    elementsToRemove: ['ember70'],
+    leftHandElementId: 'ember62',
+    rightHandElementIds: ['ember75', 'ember80', 'ember87', 'ember94']
   })
 
   await takeScreenshot(browser, {
